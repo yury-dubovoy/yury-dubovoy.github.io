@@ -2,7 +2,7 @@
 layout: post
 title: Runtime-библиотека Objective-C
 date: '2017-03-14 10:00:00 +0300'
-categories: iOS
+tags: [iOS]
 published: true
 ---
 

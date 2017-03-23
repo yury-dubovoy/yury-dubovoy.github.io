@@ -35,6 +35,16 @@ layout: default
 		    </span>
 	    {% endif %}
 	</p>
+	<p class="post-meta">
+		{% assign post = page %}
+		{% if post.tags.size > 0 %}
+			Теги:
+			{% for post_tag in post.tags %}
+				<a class="page-link" href="{{ my_page.url | relative_url }}">{{ post_tag }}</a>
+			{% endfor %}
+		{% endif %}
+	</p>
+	
   </header>
 
   <div class="post-content" itemprop="articleBody">
