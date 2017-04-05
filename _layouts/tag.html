@@ -1,0 +1,20 @@
+---
+layout: default
+---
+<h1 class="page-heading"> {{page.name}} </h1>
+
+<ul class="post-list">
+	{% if site.tags[page.slug] %}
+		{% for post in site.tags[page.slug] %}
+			<li>
+				<span class="post-meta">
+				    {% assign  current_date = post.date %}
+				    {% include page_date_rus.html %}
+				</span>
+				<h2>
+					<a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+				</h2>
+			</li>
+		{% endfor %}
+	{% endif %}
+</ul>

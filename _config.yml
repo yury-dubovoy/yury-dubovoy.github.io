@@ -32,3 +32,9 @@ exclude:
 
  # Permanent content
 further_readings: Дополнительные материалы
+
+# Where things are
+collections:
+  my_tags:
+    output: true
+    permalink: /blog/tag/:name/
