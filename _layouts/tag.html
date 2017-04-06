@@ -1,15 +1,15 @@
 ---
 layout: default
 ---
-<h1 class="page-heading"> {{page.name}} </h1>
+<h1 class="page-heading"> Статьи с тегом <b>{{page.tag_title}}</b> </h1>
 
 <ul class="post-list">
-	{% if site.tags[page.slug] %}
-		{% for post in site.tags[page.slug] %}
+	{% if site.tags[page.tag_name] %}
+		{% for post in site.tags[page.tag_name] %}
 			<li>
 				<span class="post-meta">
-				    {% assign  current_date = post.date %}
-				    {% include page_date_rus.html %}
+	                {% assign  date_rus = post.date %}
+	    		    {% include date_rus.html %}
 				</span>
 				<h2>
 					<a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>

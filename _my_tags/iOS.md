@@ -1,5 +1,5 @@
 ---
 layout: tag
-slug: ios
-name: iOS
+tag_name: ios
+tag_title: iOS
 ---

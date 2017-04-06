@@ -1,0 +1,21 @@
+{% if page.tags.size > 0 %}
+    {% for page_tag in page.tags %}
+    
+        {% assign tag = site.my_tags | where: "tag_name", page_tag %}
+        {% if tag.size > 0 %}
+            {% assign tag_list_item_url = tag[0].url %}
+            {% assign tag_list_item_title = tag[0].tag_title %}
+        {% else %}
+            {% assign tag_list_item_url = unregistered_url %}
+            {% capture unregistered_tag %}unregistered_tag [{{page_tag}}]{% endcapture %}
+            {% assign tag_list_item_title = unregistered_tag %}
+        {% endif %}
+        
+        {% capture tag_list_iteration %}
+            {{ tag_list }}<a href="{{ tag_list_item_url }}">{{ tag_list_item_title }}</a>{% if forloop.last == false %}, {% endif %}
+        {% endcapture %}
+        {% assign tag_list = tag_list_iteration %}
+        
+        
+    {% endfor %}
+{% endif %}

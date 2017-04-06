@@ -1,5 +1,5 @@
-{{ current_date | date: "%-d" }}
-{% assign m = current_date | date: "%B" %}
+{{ date_rus | date: "%-d" }}
+{% assign m = date_rus | date: "%B" %}
 {% case m %}
 	{% when 'January' %}января
 	{% when 'February' %}февраля
@@ -14,5 +14,5 @@
 	{% when 'November' %}ноября
 	{% when 'December' %}декабря
 {% endcase %}
-{{ current_date | date: "%Y" }}
+{{ date_rus | date: "%Y" }}
 

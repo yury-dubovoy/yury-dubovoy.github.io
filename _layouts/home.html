@@ -11,8 +11,8 @@ layout: default
 	  <li>
 <!-- 	    <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span> -->
 	    <span class="post-meta">
-            {% assign  current_date = post.date %}
-		    {% include page_date_rus.html %}
+            {% assign  date_rus = page.date %}
+		    {% include date_rus.html %}
 	    </span>
 	    <h2>
 	      <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>

@@ -1,5 +1,5 @@
 ---
 layout: tag
-slug: tizen
-name: Tizen
+tag_name: tizen
+tag_title: Tizen
 ---
