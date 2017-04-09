@@ -5,14 +5,17 @@
         {% if tag.size > 0 %}
             {% assign tag_list_item_url = tag[0].url %}
             {% assign tag_list_item_title = tag[0].tag_title %}
+            {% capture tag_list_item_hint %}Список статей с тегом {{ tag[0].tag_title }}{% endcapture %}
         {% else %}
-            {% assign tag_list_item_url = unregistered_url %}
             {% capture unregistered_tag %}unregistered_tag [{{page_tag}}]{% endcapture %}
             {% assign tag_list_item_title = unregistered_tag %}
+            {% capture tag_list_item_hint %}Тег {{page_tag}} добавлен по ошибке. Если это не так, следует создать список статей для этого тега.{% endcapture %}
         {% endif %}
         
         {% capture tag_list_iteration %}
-            {{ tag_list }}<a href="{{ tag_list_item_url }}">{{ tag_list_item_title }}</a>{% if forloop.last == false %}, {% endif %}
+            {% if tag_list_item_url == "unregistered_url" %}
+            {% endif %}
+            {{ tag_list }}<a title = "{{tag_list_item_hint}}" href="{{ tag_list_item_url }}">{{ tag_list_item_title }}</a>{% if forloop.last == false %}, {% endif %}
         {% endcapture %}
         {% assign tag_list = tag_list_iteration %}
         
