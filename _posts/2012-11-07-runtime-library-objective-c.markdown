@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Runtime-библиотека Objective-C
-date: '2017-03-14 10:00:00 +0300'
-tags: [ios, buba, tizen]
-published: true
+date: '2012-11-07 10:00:00 +0300'
+tags: [objective-c]
+published: false
 ---
 
 Runtime-библиотека Objective-C (_Objective-С runtime system_) — это динамическая разделяемая библиотека, предосталяющая интерфейс к набору функций и структур данных в каталоге `/usr/include/objc`:
