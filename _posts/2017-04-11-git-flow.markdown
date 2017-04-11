@@ -1,7 +1,15 @@
 ---
 layout: post
-title: GitFlow
+title: Git-flow
 date: '2017-04-11 10:00:00 +0300'
 tags: [instruments]
 published: true
 ---
+Git-flow — это набор расширений git предоставляющий высокоуровневые операции над репозиторием для поддержки модели ветвления [Vincent Driessen](http://nvie.com/posts/a-successful-git-branching-model/).
+
+Шпаргалка для основных команд находится здесь: [шпаргалка git-flow](https://danielkummer.github.io/git-flow-cheatsheet/index.ru_RU.html).
+
+
+### {{ site.further_readings }}
+* [A successful Git branching model (nvie.com)](http://nvie.com/posts/a-successful-git-branching-model/)
+* [Git-flow cheat sheet (danielkummer.github.io)](https://danielkummer.github.io/git-flow-cheatsheet/index.html)
