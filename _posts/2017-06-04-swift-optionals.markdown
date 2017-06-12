@@ -3,7 +3,7 @@ layout: post
 title: Swift Optionals
 date: '2017-06-04 10:00:00 +0300'
 tags: [swift]
-published: true
+published: false
 ---
 
 #### **Что такое Optionals?**
@@ -12,7 +12,7 @@ _Optionals_ (опционалы) — это удобный механизм об
 #### **Зачем нужны Optionals, когда есть проверка на nil?**
 Во-первых, проверка на равенство/неравенство `nil` применима только к [nullable-типам](https://en.wikipedia.org/wiki/Nullable_type) и не применима к примитивным типам, структурам и перечислениям. Для обозначения отсутсвия значения у переменной примитивного типа приходится вводить спецзначения, такие как _NSNotFound_[^1]. Соответственно, пользователь этой переменной должен учитывать, что спецзначения возможны. В Swift даже примитивный тип можно использовать в опциональном стиле, т.е явным образом указывать на то, что значения может не быть.
 
-Во-вторых: явная опциональность проверяется на этапе компиляции, что снижает количество ошибок в runtime. Опциональную переменную в Swift нельзя использовать точно так же, как неопциональную. Опционал нужно либо принудительно преобразовывать к обычному значению, либо использовать синтаксические конструкции с созданием новой переменной, такие как `if let`, `guard let` и `??`. Опционалы в Swift реализуют не просто проверку, но целую парадигму [опционального типа](https://en.wikipedia.org/wiki/Option_type) в [теории типов](https://en.wikipedia.org/wiki/Type_theory).
+Во-вторых: явная опциональность проверяется на этапе компиляции, что снижает количество ошибок в runtime. Опциональную переменную в Swift нельзя использовать точно так же, как неопциональную (за исключением неявно извлекамых опционалов, подробности в разделе _Implicit unwrapping_). Опционал нужно либо принудительно преобразовывать к обычному значению, либо использовать конструкции условия, такие как `if let`, `guard let` и `??`. Опционалы в Swift реализуют не просто проверку, но целую парадигму [опционального типа](https://en.wikipedia.org/wiki/Option_type) в [теории типов](https://en.wikipedia.org/wiki/Type_theory).
 
 В-третьих, опционалы синтаксически более лаконичны, чем проверки на `nil`, что особенно хорошо видно на цепочках опциональных вызовов — так называемый _Optional Chaining_.
 
@@ -20,7 +20,7 @@ _Optionals_ (опционалы) — это удобный механизм об
 
 
 #### **Как это работает?**
-Опционал в Swift представляет из себя особый объект-контейнер, который может содержать в себе либо `nil` либо объект конкретного типа, который указывается при объявлении этого контейнера. Эти два состояния обозначаются терминами _None_ и _Some_ соответственно. Если при создании опциональной переменной присваемое значение не указывать, то `nil` присваивается по умолчанию[^2]. Опционал объявляется посредством комбинации имени типа и лексемы `?`. Таким образом, запись `Int?` — это объявление контейнера, экземпляр которого может содержать внутри `nil`(состояние _None Int_) либо значение типа `Int` (состояние _Some Int_). Именно поэтому при преобразовании `Int?` в `Int` используетя термин _unwrapping_ вместо _cast_, т.е. подчеркивается "контейнерная" суть опционала. Лексема `nil` в Swift обозначает состояние _None_, которое можно присвоить любому опционалу. Это логично приводит к невозможности присвоить `nil` (состояние _None_) переменной, которая не является опционалом.
+Опционал в Swift представляет из себя особый объект-контейнер, который может содержать в себе либо `nil`, либо объект конкретного типа, который указывается при объявлении этого контейнера. Эти два состояния обозначаются терминами _None_ и _Some_ соответственно. Если при создании опциональной переменной присваемое значение не указывать, то `nil` присваивается по умолчанию[^2]. Опционал объявляется посредством комбинации имени типа и лексемы `?`. Таким образом, запись `Int?` — это объявление контейнера, экземпляр которого может содержать внутри `nil`(состояние _None Int_) либо значение типа `Int` (состояние _Some Int_). Именно поэтому при преобразовании `Int?` в `Int` используетя термин _unwrapping_ вместо _cast_, т.е. подчеркивается "контейнерная" суть опционала. Лексема `nil` в Swift обозначает состояние _None_, которое можно присвоить любому опционалу. Это логично приводит к невозможности присвоить `nil` (состояние _None_) переменной, которая не является опционалом.
 
 [^2]:В документации значение по умолчанию в случае отсутсвия явного присвоения не упоминается, но [сказано](https://developer.apple.com/documentation/swift/optional), что опционал _represents either a wrapped value or nil, the absence of a value_. Если опциональная переменная объявлена без явного присвоения (какое-либо _Some_ не присваивалось), то логично следует, что неявно присваивается _None_ — третьего "неинициализрованного" состояния у перечисления `Optional` нет.
 
@@ -115,7 +115,7 @@ var my_variable: Int? = nil // или var my_variable: Int? = Optional.none
 {% highlight swift %}
 var my_variable: Int?
 {% endhighlight %}
-поскольку `nil`(`Optional.none`) будет присвоен по умолчанию.
+поскольку `nil` будет присвоен по умолчанию.
 
 Перечисление `Optional<Wrapped>` также содержит свойство unsafelyUnwrapped, которое предоставляет доступ (только для чтения) к `.some`-значению опционала:
 
@@ -130,9 +130,10 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
 }
 {% endhighlight %}
 
-Принудительное извлечение `.some`-значения обозначается лексемой `!` и называется _Force Unwrapping_ или _Explicit Unwrapping_. Применение _force unwrapping_ к опционалу в состоянии `.none` приведет к ошибке рантайма[^3] и аварийному завершению программы.
+Если опционал находится в состоянии `.none`, обращение к `unsafelyUnwrapped` приведет к сбою программы. В режиме отладки _debug build -Onone_ это приведет к ошибке рантайма[^3], в релизной сборке _optimized build -O_ — к ошибке рантайма **[либо неопределенному поведению](https://developer.apple.com/documentation/swift/optional/1641793-unsafelyunwrapped)**. Более безопасной операцией является _Force Unwrapping_ (или _Explicit Unwrapping_) — принудительное извлечение `.some`-значения, обозначаемое лексемой `!`. Применение _force unwrapping_ к опционалу в состоянии `.none` приведет к ошибке рантайма[^4].
 
-[^3]:Вывод в консоль: _fatal error: unexpectedly found nil while unwrapping an Optional value_
+[^3]:Вывод в консоль: _fatal error: unsafelyUnwrapped of nil optional_
+[^4]:Вывод в консоль: _fatal error: unexpectedly found nil while unwrapping an Optional value_
 
 {% highlight swift %}
 
@@ -141,21 +142,24 @@ let my_value1A = my_variable1! // содержит 42, тип Int
 let my_value1B = my_variable1.unsafelyUnwrapped // содержит 42, тип Int
 
 let my_variable2 = Int?.none // содержит nil, тип Optional Int
-let my_value2 = my_variable2! // ошибка рантайма
+let my_value2A = my_variable2! // ошибка рантайма
+// ошибка рантайма в режиме -Onone, НЕОПРЕДЕЛЕННОЕ ПОВЕДЕНИЕ в режиме -O
+let my_value2B = my_variable2.unsafelyUnwrapped
 
 {% endhighlight %}
 
 
 #### **Идиомы использования**
-Нет особого смысла использовать обычное перечисление с двумя состояниями. Вполне можно реализовать подобный механизм самостоятельно: создать _enum_ c двумя состояниями и конструкторами для соответствующих значений, добавить какой-нибудь постфиксный оператор для _force unwrapping_ (например, как это сделано [здесь](http://jamesonquave.com/blog/re-implementing-optionals-using-swifts-powerful-enum-type/)), добавить возможность сравнения с `nil` или вообще придумать "свой" `nil` и т.д. Опционалы должны быть интегрированы непосредственно в сам язык, чтобы их использование было естественным, не чужеродным. Разумеется, можно рассматривать такую интеграцию как "синтаксический сахар", однако языки высокого уровня для того и существуют, чтобы писать (и читать!) код на них было легко и приятно. Использование опционалов в Swift подразумевает ряд идиом или паттернов, которые помогают уменьшить количество ошибок и сделать код более лаконичным. К таким идиомам относятся _Implicit Unwrapping_, _Optional Chaining_, _Optional Binding_(конструкции `if let` и `guard let`), а также оператор _Nil-Coalescing_ `??`.
+Нет особого смысла использовать обычное перечисление с двумя состояниями. Вполне можно реализовать подобный механизм самостоятельно: создать _enum_ c двумя состояниями и конструкторами для соответствующих значений, добавить какой-нибудь постфиксный оператор для _force unwrapping_ (например, как это сделано [здесь](http://jamesonquave.com/blog/re-implementing-optionals-using-swifts-powerful-enum-type/)), добавить возможность сравнения с `nil` или вообще придумать "свой" `nil` и т.д. Опционалы должны быть интегрированы непосредственно в сам язык, чтобы их использование было естественным, не чужеродным. Разумеется, можно рассматривать такую интеграцию как "синтаксический сахар", однако языки высокого уровня для того и существуют, чтобы писать (и читать) код на них было легко и приятно. Использование опционалов в Swift подразумевает ряд идиом или паттернов, которые помогают уменьшить количество ошибок и сделать код более лаконичным. К таким идиомам относятся _Implicit Unwrapping_, _Optional Chaining_, _Nil-Coalescing_ и _Optional Binding_.
 
 #### **Implicit unwrapping**
 
-Безопасное использование _force unwrapping_ подразумевает предварительную проверку на `nil` в условии `if`:
+Безопасное использование _force unwrapping_ подразумевает предварительную проверку на `nil`, например, в условии `if`:
 
 {% highlight swift %}
 
-let my_variable: Int? = tryGetResult() // тип Optional Int, значение неизвестно
+// tryGetResult() может вернуть nil
+let my_variable: Int? = tryGetResult() // тип Optional Int
 if my_variable != nil {
   let my_value = my_variable! // содержит значение, вычисленное в tryGetResult()
 } else {
@@ -164,7 +168,7 @@ if my_variable != nil {
 
 {% endhighlight %}
 
-Иногда из структуры программы очевидным образом следует, что переменная технически является опционалом, но к моменту первого использования всегда находится в состоянии .some, т.е. не является `nil`. Для использования опционала в неопциональном контексте (например, передать в функцию, у которой параметр обычного типа, а не опционал) приходится постоянно применять _force unwrapping_ с проверкой, что скучно и утомительно. В этих случаях можно применить неявно извлекаемый опционал _Implicitly Unwrapped Optional_. Неявно извлекамый опционал объявляется посредством комбинации имени типа и лексемы `!`:
+Иногда из структуры программы очевидным образом следует, что переменная технически является опционалом, но к моменту первого использования всегда находится в состоянии `.some`, т.е. не является `nil`. Для использования опционала в неопциональном контексте (например, передать его в функцию с параметром неопционального типа) приходится постоянно применять _force unwrapping_ с предварительной проверкой, что скучно и утомительно. В этих случаях можно применить неявно извлекаемый опционал — _Implicitly Unwrapped Optional_. Неявно извлекамый опционал объявляется посредством комбинации имени типа и лексемы `!`:
 
 {% highlight swift %}
 
@@ -186,18 +190,18 @@ func sayHello(times:Int) {
 
 sayHello(times: my_variable1!) // обязаны извлекать значение явно
 sayHello(times: my_variable1) // ошибка компиляции
-sayHello(times: my_variable2!) // можно извлекать значение явно
-sayHello(times: my_variable2) // неявное извлечение// обязаны извлекать явно
+sayHello(times: my_variable2!) // можем, но не обязаны извлекать значение явно
+sayHello(times: my_variable2) // неявное извлечение
 sayHello(times: my_variable3) // ошибка рантайма
 
 {% endhighlight %}
 
-В вызове `sayHello(times: my_variable2)` извлечения значения `42` из `my_variable2` **все равно осущетсвляется, только неявно**. Использование неявно извлекаемых опционалов делает код более удобным для чтения, но на практике это скорее анти-паттерн, увеличивающий вероятность ошибки. Неявно извлекаемый опционал заставляет компилятор "закрыть глаза" на то, что опционал используется в неопциональном контексте. Ошибка, которая может быть выявлена во время компиляции (вызов `sayHello(times: my_variable1)`), проявится только в рантайме (вызов `sayHello(times: my_variable3)`). Явный код всегда лучше неявного. Логично предположить, что такое явно снижение безопасности кода требуется не только ради "синтаксического сахара", и это действительно так.
+В вызове `sayHello(times: my_variable2)` извлечение значения `42` из `my_variable2` **все равно осуществляется, только неявно**. Использование неявно извлекаемых опционалов делает код более удобным для чтения — нет восклицательных знаков, которые отвлекают внимание (вероятно, читающего код будет беспокоить использование _force unwrapping_ без предварительной проверки). На практике это скорее анти-паттерн, увеличивающий вероятность ошибки. Неявно извлекаемый опционал заставляет компилятор "закрыть глаза" на то, что опционал используется в неопциональном контексте. Ошибка, которая может быть выявлена во время компиляции (вызов `sayHello(times: my_variable1)`), проявится только в рантайме (вызов `sayHello(times: my_variable3)`). Явный код всегда лучше неявного. Логично предположить, что такое снижение безопасности кода требуется не только ради "синтаксического сахара", и это действительно так.
 
 Неявно извлекаемые опционалы позволяют использовать `self` в конструкторе для иницализации свойств и при этом:
 
-* не нарушать правил [двухэтапной инициализации](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Initialization.html#//apple_ref/doc/uid/TP40014097-CH18-ID220) (в конструкторе все свойства должны быть инициализированы до обращения к `self`);
-* использовать свойство в неопциональном контексте (без необходимости добавлять `!` при обращении к свойству).
+* не нарушать правил [двухэтапной инициализации](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Initialization.html#//apple_ref/doc/uid/TP40014097-CH18-ID220) (в конструкторе все свойства должны быть инициализированы до обращения к `self`) — иначе код просто не скомпилируется;
+* избежать излишней опциональности в свойстве, для которого она не требуется (по своему смыслу значение свойства не может отсутствовать).
 
 Наглядный пример, где требуется использовать `self` в конструкторе для иницализации свойств, приведен в [документации](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/AutomaticReferenceCounting.html#//apple_ref/doc/uid/TP40014097-CH20-ID55):
 
@@ -227,32 +231,205 @@ print("\(country.name)'s capital city is called \(country.capitalCity.name)")
 
 {% endhighlight %}
 
-В этом примере экземпляры классов _Country_ и _City_ должны иметь ссылки друга на друга к моменту завершения инициализации. У каждой страны обязательно должна быть столица и у каждой столицы обязательно должна быть страна. Эти связи не являются опциональными. В процессе инициализации объекта `country` необходимо инициализировать свойство `capitalCity`. Для инициализации `capitalCity` нужно создать экземпляр класса _City_. Конструктор _City_ в качестве параметра требует экземпляр _Country_, но сложность в том, что экземпляр _Country_ на этот момент еще не до конца инициализирован (требуется доступ к `self`).
+В этом примере экземпляры классов _Country_ и _City_ должны иметь ссылки друга на друга к моменту завершения инициализации. У каждой страны обязательно должна быть столица и у каждой столицы обязательно должна быть страна. Эти связи не являются опциональными — они безусловны. В процессе инициализации объекта `country` необходимо инициализировать свойство `capitalCity`. Для инициализации `capitalCity` нужно создать экземпляр класса _City_. Конструктор _City_ в качестве параметра требует соответствующий экземпляр _Country_, но сложность в том, что экземпляр _Country_ на этот момент еще не до конца инициализирован (требуется доступ к `self`).
 
-Эта задача имеет изящное решение: `capitalCity` объявляется неявно извлекаемым опционалом. Как и любой опционал, `capitalCity` по умолчанию присваивается `nil`, т. е. к моменту вызова конструктора _City_ все свойства `country` уже инициализированы. Требования двухэтапной инициализации соблюдены, конструктор _Country_ находится во второй фазе — можно передавать `self` в конструктор _City_. `capitalCity` является неявным опционалом, т.е. к нему можно обращаться в неопциональном контексте без добавления `!`.
+Эта задача имеет изящное решение: `capitalCity` объявляется неявно извлекаемым опционалом. Как и любой опционал, `capitalCity` по умолчанию инициализируется состоянием `nil`, т. е. к моменту вызова конструктора _City_ все свойства объекта `country` уже инициализированы. Требования двухэтапной инициализации соблюдены, конструктор _Country_ находится во второй фазе — можно передавать `self` в конструктор _City_. `capitalCity` является неявным опционалом, т.е. к нему можно обращаться в неопциональном контексте без добавления `!`.
 
-**Таким образом, лексема `!` может быть использована в двух контекстах:**
+Побочным эффектом использования неявно извлекаемого опционала является "встроенный" `assert`: если `capitalCity` по каким-либо причинам останется в состоянии `nil`, это приведет к ошибке рантайма и аварийному завершению работы программы.
+
+Другим примером оправданного использования неявно извлекаемых опционалов могут послужить инструкции `@IBOutlet`: контекст их использования подразумевает, что переменной к моменту первого обращения автоматически будет присвоено `.some`-значение.  Если это не так, то произойдет ошибка рантайма. Автоматическая генерация кода в _Interface Builder_ создает свойства с `@IBOutlet` именно в виде неявных опционалов. Если такое поведение неприемлемо, свойство с `@IBOutlet` можно объявить в виде явного опционала и всегда обрабатывать `.none`-значения явным образом. Как правило, все же лучше сразу получить "падение", чем заниматься долгой отладкой в случае случайно отвязанного `@IBOutlet`-свойства.
+
+Таким образом, лексема `!` может быть использована в двух контекстах:
 
 * для принудительного извлечения значения из опционала;
 * для объявления неявного опционала.
 
 #### **Optional Chaining**
 
-  **Таким образом, лексема `?` может быть использована в трех контекстах:**
+_Optional Chaining_ — это процесс последовательных вызовов по цепочке, где каждое из звеньев возвращает опционал. Процесс прерывается на первом опционале, находящемся в состоянии `nil` — в этом случае результатом всей цепочки вызовов также будет `nil`. Если все звенья цепочки находятся в состоянии `.some`, то результирующим значением будет опционал с результатом последнего вызова. Для формирования звеньев цепочки используется лексема `?`, которая помещается сразу за вызовом, возвращающим опционал. Звеньями цепочки могут любые операции, которые возвращают опционал: обращение к локальной переменной (в качестве первого звена), вызовы свойств и методов, доступ по индексу.
+
+_Optional сhaining_ всегда работает последовательно слева направо. Каждому следующему звену передается `.some`-значение предыдущего звена, при этом результирующее значение цепочки всегда является опционалом, т.е. цепочка работает по следующим правилам:
+
+* первое звено должно быть опционалом;
+* после лексемы `?` должно быть следующее звено;
+* если звено в состояни `.none`, то цепочка прерывает процесс вызовов и возвращает `nil`;
+* если звено в состояни `.some`, то цепочка отдает `.some`-значение звена на вход следующему звену (если оно есть);
+* если результат последнего звена является опционалом, то цепочка возвращает этот опционал;
+* если результат последнего звена не является опционалом, то цепочка возвращает этот результат, "завернутый" в опционал (результат присваивается `.some`-значению возвращаемого опционала).
+
+{% highlight swift %}
+
+// цепочка из трех звеньев: первое звено — опционал 'country.mainSeaport?',
+country.mainSeaport?.nearestVacantPier?.capacity
+
+// ошибка компиляции, после '?' должно быть следующее звено
+let mainSeaport = country.mainSeaport?
+
+// цепочка вернет 'nil' на первом звене
+country = Country(name: "Mongolia")
+let capacity = country.mainSeaport?.mainPier?.capacity
+
+// цепочка вернет опционал — ближайший незанятый пирс в Хельсинки
+country = Country(name: "Finland")
+let nearestVacantPier = country.mainSeaport?.nearestVacantPier
+
+// цепочка вернет опционал — количество свободных мест, даже если capacity
+// является неопциональным значением
+country = Country(name: "Finland")
+let capacity = country.mainSeaport?.nearestVacantPier?.capacity
+
+{% endhighlight %}
+
+Таким образом, лексема `?` может быть использована в двух контекстах:
 
   * для объявления явного опционала;
-  * для опционального извлечения значения из опционала.
+  * для использования опционала в _optional chaining_.
 
+Важно отличать цепочки опциональных вызовов от вложенных опционалов. Вложенный опционал образуется, когда `.some`-значением одного опционала является другой опционал:
 
-#### **Optional Binding**
+{% highlight swift %}
 
-конструкция iflet
-конструкция guard
+let valueA = 42
+let optionalValueA = Optional(valueA)
+let doubleOptionalValueA = Optional(optionalValueA)
+let tripleOptionalValueA = Optional(doubleOptionalValueA)
 
+let tripleOptionalValueB: Int??? = 42 // три '?' означают тройную вложенность
+let doubleOptionalValueB = tripleOptionalValueB!
+let optionalValueB = doubleOptionalValueB!
+let valueB = optionalValueB!
 
+print("\(valueA)") // 42
+print("\(optionalValueA)") // Optional(42)
+print("\(doubleOptionalValueA)") // Optional(Optional(42))
+print("\(tripleOptionalValueA)") // Optional(Optional(Optional(42)))
+
+print("\(tripleOptionalValueB)") // Optional(Optional(Optional(42)))
+print("\(doubleOptionalValueB)") // Optional(Optional(42))
+print("\(optionalValueB)") // Optional(42)
+print("\(valueB)") // 42
+
+{% endhighlight %}
+
+_Optional сhaining_ не увеличивает уровень вложенности возвращаемого опционала. Тем не менее, это не исключает ситуации, когда результирующим значением какого-либо звена является опционал с несколькими уровнями вложенности. В таких ситуациях для продолжения цепочки необходимо прописать `?` в количестве, равном количеству уровней вложенности[^5]:
+
+[^5]:Вообще говоря, необязательно, чтобы все уровни вложенности были "развернуты" с помощью лексемы `?`.Часть из них можно заменить на принудительное извлечение `!`, что сократит количество "неявных" звеньев в цепочке. Отдельный вопрос, есть ли в этом смысл.
+
+{% highlight swift %}
+
+let optionalAppDelegate = UIApplication.shared.delegate
+let doubleOptionalWindow = UIApplication.shared.delegate?.window
+let optionalFrame = UIApplication.shared.delegate?.window??.frame // два '?'
+print("\(optionalAppDelegate)") // Optional( ... )
+print("\(doubleOptionalWindow)") // Optional(Optional( ... ))
+print("\(optionalFrame)") // Optional( ... )
+
+{% endhighlight %}
+
+Цепочка `UIApplication.shared.delegate?.window??.frame` фактически состоит из четырех звеньев: `UIApplication.shared.delegate?`, `.frame` и два звена, объединенных в одном вызове `.window??`. Второе "двойное" звено представлено опционалом второго уровня вложенности.
+
+Важной особенностью этого примера также является особый способ формирования двойного опционала, отличающийся от способа формирования `doubleOptionalValue` в предыдущем примере. `UIApplication.shared.delegate!.window` является **опциональным свойством**, в котором возвращается опционал. Опциональность свойства означает, что может отсутствовать само свойство, а не только `.some`-значение у опционала, возвращаемого из свойства. Опциональное свойство, также как и все прочие свойства, может возвращать любой тип, не только опциональный. Опциональность такого рода формируется в [@objc-протоколах](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html#//apple_ref/doc/uid/TP40014097-CH25-ID284) с помощью модификатора `optional`:
+
+{% highlight swift %}
+public protocol UIApplicationDelegate : NSObjectProtocol {
+
+...
+
+@available(iOS 5.0, * )
+optional public var window: UIWindow? { get set } // модификатор optional
+
+...
+
+}
+{% endhighlight %}
+
+В протоколах с опциональными свойствами и методами (требованиями) модификатор `@objc` указывается для каждого опционального требования и для самого протокола. Вызов нереализованного требования у объекта, реализующего такой протокол, возвращает опционал соответствующего типа в состоянии `.none`. Вызов реализованного требования возвращает опционал соответсвующего типа в состоянии `.some`. Таким образом, опциональные свойства и методы, в отличие от _optional сhaining_, увеличивают уровень вложенности возвращаемого опционала. Опциональный метод, как и свойство, "заворачивается" в опционал полностью — в `.some`-значение помещается метод целиком, а не только возращаемое значение:
+
+{% highlight swift %}
+
+@objc
+public protocol myOptionalProtocol {
+
+    @objc
+    optional var my_variable: Int { get }
+
+    @objc
+    optional var my_optionalVariableA: Int? { get } // ошибка компиляции
+
+    @objc
+    optional var my_optionalVariableB: UIView? { get }
+
+    @objc
+    optional func my_func() -> Int
+
+    @objc
+    optional func my_optionalResultfuncA() -> Int? // ошибка компиляции
+
+    @objc
+    optional func my_optionalResultfuncB() -> UIView?
+
+    @objc
+    optional init(value: Int) // ошибка компиляции
+
+}
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate, myOptionalProtocol {
+
+    var window: UIWindow?
+
+    func application(_ application: UIApplication,
+      didFinishLaunchingWithOptions launchOptions:
+      [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+
+        let protocolAdoption = self as myOptionalProtocol
+
+        // Optional<Int>
+        print("\(type(of: protocolAdoption.my_variable))")
+
+        // Optional<Optional<UIView>>
+        print("\(type(of: protocolAdoption.my_optionalVariableB))")
+
+        // Optional<() -> Int>
+        print("\(type(of: protocolAdoption.my_func))")
+
+        // Optional<Int>
+        print("\(type(of: protocolAdoption.my_func?()))")
+
+        // Optional<() -> Optional<UIView>>
+        print("\(type(of: protocolAdoption.my_optionalResultfuncB))")
+
+        // Optional<UIView>
+        print("\(type(of: protocolAdoption.my_optionalResultfuncB?()))")
+
+        return true
+    }
+}
+
+{% endhighlight %}
+
+Для опциональных `@objc`-протоколов имеется ряд ограничений, в виду того, что они были введены в Swift специально для взаимодействия с кодом на Objective-C:
+* могут быть реализованы только в классах, унаследованных от классов Objective-C, либо других классов с аттрибутом `@objc` (т.е. не могут быть реализованы в структурах и перечислениях);
+* модификатор `optional` неприменим к требованиям-конструкторам `init`;
+* cвойства и методы с аттрибутом `@objc` имеют ограничение на тип возвращаемого опционала — допускаются только классы.
+
+Попытка применить _force unwrapping_ на нереализованном свойстве или методе приведет к точно такой же ошибке рантайма, как и применение _force unwrapping_ на любом другом опционале в состоянии `.none`.
 
 #### **Nil-Coalescing**
 [Using the Nil-Coalescing Operator](https://developer.apple.com/documentation/swift/optional)
+
+**посмотреть определения для постфиксных операторов ! и ?** (действительно ли `.some`-значение на вход звену?)
+
+
+Аналог тернарного оператора
+
+{% highlight swift %}
+
+public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T) rethrows -> T
+
+public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) rethrows -> T?
+
+{% endhighlight %}
 
 Важно не забывать, что опционал в качестве .some-значения тоже может содержать в себе опционал! В результате получим такую запись вида:
 {% highlight swift %}
@@ -270,16 +447,18 @@ newValue!.makeKey()
 
 {% endhighlight %}
 
-??
-как же без них:
-один ? на возврат нуля из функции map, другой ? на возврат из свойства window. А тройной можно?
+Таким образом, лексема `??` может быть использована в двух контекстах:
 
-  **Таким образом, лексема `??` может быть использована в двух контекстах:**
+  * в контексте _Optional сhaining_ для обращения к опционалу второго уровня вложенности;
+  * в качестве оператора Nil-Coalescing.
 
-  * в качестве оператора Nil-Coalescing
-  * для опционального извлечения значения из опционала;
-  * для двойного .
 
+#### **Optional Binding**
+
+конструкции `if let` и `guard let`
+
+Использование условий в качестве проверки, был ли выполнен метод или было ли успешно присвание: каждый метод/функция без return неявно возращает пустой кортеж, что может быть использовано для проверки на `nil`. Дело вкуса, но не факт, что подобная запись выглядит более естественно, чем явная предварительная проверка. Зависит от договоренностей по стилю кодирования, принятых на проекте.
+https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/OptionalChaining.html#//apple_ref/doc/uid/TP40014097-CH21-ID249
 
 #### **pap и flatMap**
 условно можно отнести к идиомам, потому что это просто функции, определнные в системном перечислении _Optional_
@@ -345,11 +524,7 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
 }
 {% endhighlight %}
 
-#### **Optionals и ARC**
-  https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/AutomaticReferenceCounting.html#//apple_ref/doc/uid/TP40014097-CH20-ID55
-  Сделать переменную опциональной — не то же самое, что сделать weak-ссылку! Weak либо unowned нужно делать отдельно!
-
-  А что будет, если переменная unowned превратится в ноль, хотя сама карточка еще существует (на нее дополнительную ссылку дали)
+#### **Опционалы и приведение типов: as, as? и as!**
 
 #### **Связка с Objective-C**
 В Objective-C нет понятия опциональности, близко по смыслу находится возможность вернуть`nil` из метода, который обычно возвращает объект. В Swift и в Objective-C лексема `nil` имеет различную смысловую нагрузку. В Swift `nil` — это _Nothing_, т.е. признак отсутствия значения в переменной optional-типа, применяется к любым optional-типам. В Objective-C `nil` является указателем на несуществующий объект и применим только к типам объектов.
@@ -359,7 +534,7 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
 В чем разница между `_Nullable` и `nullable`?
 `null_unspecified` вообще нигде не упоминается, кроме как в статье на хабре.
 
-#### **А ЧТО НАСЧЕТ конвертации кода?**
+**А ЧТО НАСЧЕТ конвертации кода?**
   [Дополнительные замечания](https://medium.com/@thanyalukj/nullability-keywords-and-interoperability-between-objective-c-and-swift-220338af958b):
   nonnull keywords are imported by Swift as a non-optional
   nullable keywords are imported by Swift as an optional
@@ -373,11 +548,13 @@ null — это ошибка на миллион долларов. В свифт
 
 
 ### {{ site.further_readings }}
-* [Optional — Generic Enumeration (developer.apple.com)](https://developer.apple.com/documentation/swift/optional)
+* [Generic Enumeration: Optional (developer.apple.com)](https://developer.apple.com/documentation/swift/optional)
+* [Instance Property: unsafelyUnwrapped (developer.apple.com)](https://developer.apple.com/documentation/swift/optional/1641793-unsafelyunwrapped)
 * [Swift Language Guide: Optionals (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/TheBasics.html#//apple_ref/doc/uid/TP40014097-CH5-ID330)
 * [Unowned References and Implicitly Unwrapped Optional Properties (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/AutomaticReferenceCounting.html#//apple_ref/doc/uid/TP40014097-CH20-ID55)
 * [Nil-Coalescing Operator (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/BasicOperators.html#//apple_ref/doc/uid/TP40014097-CH6-ID72)
 * [Optional Chaining (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/OptionalChaining.html)
+* [Optional Protocol Requirements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html#//apple_ref/doc/uid/TP40014097-CH25-ID284)
 * [Nullability and Objective-C (developer.apple.com)](https://developer.apple.com/swift/blog/?id=25)
 * [Option type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Option_type)
 * [Nullable type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Nullable_type)
