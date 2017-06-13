@@ -3,8 +3,10 @@ layout: post
 title: Swift Optionals
 date: '2017-06-04 10:00:00 +0300'
 tags: [swift]
-published: false
+published: true
 ---
+
+<!-- Всем привет! Я уже несколько лет профессионально (т.е. работа такая) занимаюсь iOS-разработкой, по большей части на Swift. Регулярно на почве свифтовых опционалов возникали ситуации, когда я знал _что_ нужно делать, но не совсем внятно представлял, _почему_ именно так. Приходилось отвлекаться и углубляться в документацию — количество "заметок на полях" пополнялось с удручающей периодичностью. В определенный момент они достигли критической массы, и я решил упорядочить их в едином исчерпывающем руководстве. Материал получился довольно объемным, поскольку предпринята попытка раскрыть тему максимально подробно. Статья будет полезна как начинающим Swift-разрабочикам, так и матерым профессионалам — есть ненулевая вероятность, что и последние найдут для себя что-то новое. А если не найдут, то добавят свое новое в комментарии, и всем будет польза. Прошу под кат!  -->
 
 #### **Что такое Optionals?**
 _Optionals_ (опционалы) — это удобный механизм обработки ситуаций, когда значение переменной может отсутствовать. Значение будет использовано, только если оно есть.
@@ -233,16 +235,11 @@ print("\(country.name)'s capital city is called \(country.capitalCity.name)")
 
 В этом примере экземпляры классов _Country_ и _City_ должны иметь ссылки друга на друга к моменту завершения инициализации. У каждой страны обязательно должна быть столица и у каждой столицы обязательно должна быть страна. Эти связи не являются опциональными — они безусловны. В процессе инициализации объекта `country` необходимо инициализировать свойство `capitalCity`. Для инициализации `capitalCity` нужно создать экземпляр класса _City_. Конструктор _City_ в качестве параметра требует соответствующий экземпляр _Country_, но сложность в том, что экземпляр _Country_ на этот момент еще не до конца инициализирован (требуется доступ к `self`).
 
-Эта задача имеет изящное решение: `capitalCity` объявляется неявно извлекаемым опционалом. Как и любой опционал, `capitalCity` по умолчанию инициализируется состоянием `nil`, т. е. к моменту вызова конструктора _City_ все свойства объекта `country` уже инициализированы. Требования двухэтапной инициализации соблюдены, конструктор _Country_ находится во второй фазе — можно передавать `self` в конструктор _City_. `capitalCity` является неявным опционалом, т.е. к нему можно обращаться в неопциональном контексте без добавления `!`.
+Эта задача имеет изящное решение: `capitalCity` объявляется мутабельным неявно извлекаемым опционалом. Как и любой мутабельный опционал, `capitalCity` по умолчанию инициализируется состоянием `nil`, т. е. к моменту вызова конструктора _City_ все свойства объекта `country` уже инициализированы. Требования двухэтапной инициализации соблюдены, конструктор _Country_ находится во второй фазе — можно передавать `self` в конструктор _City_. `capitalCity` является неявным опционалом, т.е. к нему можно обращаться в неопциональном контексте без добавления `!`.
 
 Побочным эффектом использования неявно извлекаемого опционала является "встроенный" `assert`: если `capitalCity` по каким-либо причинам останется в состоянии `nil`, это приведет к ошибке рантайма и аварийному завершению работы программы.
 
 Другим примером оправданного использования неявно извлекаемых опционалов могут послужить инструкции `@IBOutlet`: контекст их использования подразумевает, что переменной к моменту первого обращения автоматически будет присвоено `.some`-значение.  Если это не так, то произойдет ошибка рантайма. Автоматическая генерация кода в _Interface Builder_ создает свойства с `@IBOutlet` именно в виде неявных опционалов. Если такое поведение неприемлемо, свойство с `@IBOutlet` можно объявить в виде явного опционала и всегда обрабатывать `.none`-значения явным образом. Как правило, все же лучше сразу получить "падение", чем заниматься долгой отладкой в случае случайно отвязанного `@IBOutlet`-свойства.
-
-Таким образом, лексема `!` может быть использована в двух контекстах:
-
-* для принудительного извлечения значения из опционала;
-* для объявления неявного опционала.
 
 #### **Optional Chaining**
 
@@ -279,11 +276,6 @@ country = Country(name: "Finland")
 let capacity = country.mainSeaport?.nearestVacantPier?.capacity
 
 {% endhighlight %}
-
-Таким образом, лексема `?` может быть использована в двух контекстах:
-
-  * для объявления явного опционала;
-  * для использования опционала в _optional chaining_.
 
 Важно отличать цепочки опциональных вызовов от вложенных опционалов. Вложенный опционал образуется, когда `.some`-значением одного опционала является другой опционал:
 
@@ -416,42 +408,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate, myOptionalProtocol {
 Попытка применить _force unwrapping_ на нереализованном свойстве или методе приведет к точно такой же ошибке рантайма, как и применение _force unwrapping_ на любом другом опционале в состоянии `.none`.
 
 #### **Nil-Coalescing**
-[Using the Nil-Coalescing Operator](https://developer.apple.com/documentation/swift/optional)
 
-**посмотреть определения для постфиксных операторов ! и ?** (действительно ли `.some`-значение на вход звену?)
-
-
-Аналог тернарного оператора
+Оператор _Nil-Coalescing_ возвращает `.some`-значение опционала, если опционал в состоянии `.some`, и значение по умолчанию, если опционал в состоянии `.none`. Обычно _Nil-Coalescing_ более лаконичен, чем условие `if else`, и легче воспринимается, чем тернарный условный оператор `?`:
 
 {% highlight swift %}
 
-public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T) rethrows -> T
+let optionalText: String? = tryExtractText()
 
-public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) rethrows -> T?
-
-{% endhighlight %}
-
-Важно не забывать, что опционал в качестве .some-значения тоже может содержать в себе опционал! В результате получим такую запись вида:
-{% highlight swift %}
-var value: AppDelegate?
-var newValue = value.map { $0.window }
-newValue??.makeKey()
-
-var value: AppDelegate?
-var newValue = value.flatMap { (value: AppDelegate) -> UIWindow? in
-    //$0.window
-    return value.window
+// многословно
+let textA: String
+if optionalText != nil {
+    textA = optionalText!
+} else {
+    textA = "Extraction Error!"
 }
-newValue!.makeKey()
 
+// в одну строку, но заставляет думать
+let textB = (optionalText != nil) ? optionalText! : "Extraction Error!"
+
+// кратко и легко воспринимать
+let textC = optionalText ?? "Extraction Error!"
 
 {% endhighlight %}
 
-Таким образом, лексема `??` может быть использована в двух контекстах:
+Тип значения по умолчания справа должен соответствовать типу `.some`-значения опционала слева. Значение по умолчанию тоже может быть опционалом:
 
-  * в контексте _Optional сhaining_ для обращения к опционалу второго уровня вложенности;
-  * в качестве оператора Nil-Coalescing.
+{% highlight swift %}
 
+let optionalText: String?? = tryExtractOptionalText()
+let a = optionalText ?? Optional("Extraction Error!")
+
+{% endhighlight %}
+
+Возможность использовать выражения в качестве правого операнда позволяет создавать цепочки из умолчаний:
+
+{% highlight swift %}
+
+let wayA: Int? = doSomething()
+let wayB: Int? = doNothing()
+let defaultWay: Int = ignoreEverything()
+
+let whatDo = wayA ?? wayB ?? defaultWay
+
+{% endhighlight %}
 
 #### **Optional Binding**
 
@@ -472,6 +471,25 @@ let arrayOfOptionals: [Int?] = [1, nil, 5, 2, nil]
 let arrayOfNumbers = arrayOfOptionals.flatMap { $0 }
 print(arrayOfNumbers) // [1, 5, 2]
 {% endhighlight %}
+
+// плохой пример, неудобно читать
+let attachHeight: CGFloat = attach.map { $0.isForward() ? 100 : 0 } ?? 0
+
+let attachHeight: CGFloat
+if attach != nil {
+    attachHeight = attach!.isForward() ? 100 : 0
+} else {
+    attachHeight = 0
+}
+
+// хороший пример, удобно читать
+replaySplitter.frame = textCellLayout.replaySptillerFrame.map { $0 } ?? CGRect.zero
+
+if textCellLayout.replaySptillerFrame != nil {
+    replaySplitter.frame = textCellLayout.replaySptillerFrame!
+} else {
+    replaySplitter.frame = CGRect.zero
+}
 
 
 
@@ -524,6 +542,17 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
 }
 {% endhighlight %}
 
+
+
+{% highlight swift %}
+
+public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T) rethrows -> T
+
+public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) rethrows -> T?
+
+{% endhighlight %}
+
+
 #### **Опционалы и приведение типов: as, as? и as!**
 
 #### **Связка с Objective-C**
@@ -541,11 +570,35 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
   Types declared without a nullability annotation are imported by Swift as implicitly unwrapped optional
   null_resettable keyword is an interesting one.
 
-#### **Парадигма опционального типа (вместо заключения)**
+#### **Резюме, синтаксис**
 
-null — это ошибка на миллион долларов. В свифте предпринята попытка избавиться от нее. Null должен быть отдельной сущностью, нельзя связывать значение объекта (данные, куда указывает указатель) с фактом отсутсвия данных. Сами данные хранят в себе информацию о том, существуют ли они — это очень тупо. Возможно, поэтому и человек не может точно сказать, существует ли он, поскольку не видит систему извне. Отсюда всякие тезисы типа "я мыслю, поэтому существую".
+Лексема `!` может быть использована в трех контекстах, связанных с опциональностью[^6] :
 
+* для принудительного извлечения значения из опционала;
+* для объявления неявного опционала;
+* для принудительной конвертации типов в операторе `as!`.
 
+[^6]:Унарный логического отрицания `!` не считается, поскольку относится к другому контексту.
+
+Лексема `?` может быть использована в двух контекстах, связанных с опциональностью[^7]:
+
+* для объявления явного опционала;
+* для использования опционала в _optional chaining_.
+* для опциональной конвертации типов в операторе `as?`.
+
+[^7]:Тернарный условный оператор `?` не считается, поскольку относится к другому контексту.
+
+Лексема `??` может быть использована в двух контекстах:
+
+* в _Optional сhaining_ для обращения к опционалу второго уровня вложенности;
+* в качестве оператора _Nil-Coalescing_.
+
+#### **Заключение**
+
+Nullable-указатель — это [ошибка на миллиард долларов](https://en.wikipedia.org/wiki/Tony_Hoare). Указатель не должен существовать без сущности, на которую он указывает.
+Практика объединения значения указателя с фактом отсутствия данных (например, нулевой указатель _null_ в С++ или Java) не решает проблему специфичных констант. Вызывающая сторона все равно должна учитывать контекст и проверять результат на равенство специфичной константе, означающее отсутствие данных. Тот факт, что константа _null_ всего одна, принципиально ситуацию не меняет и лишь добавляет неожиданностей при преобразовании типов.
+
+Факт отсутствия данных должен обрабатываться отдельной сущностью, внешней по отношению к самим данным. Даже человеку, т.е. довольно сложной системе, приходится довольстоваться аксиомой _Cogito, ergo sum_ (лат.  — "Мыслю, следовательно существую"). У человека нет других достоверных признаков, указывающих на факт собственного осуществования. У внешних по отношению у человеку сущностей, очевидно, такие признаки есть. В Swift такой внешней сущностью является опционал.
 
 ### {{ site.further_readings }}
 * [Generic Enumeration: Optional (developer.apple.com)](https://developer.apple.com/documentation/swift/optional)
@@ -555,6 +608,7 @@ null — это ошибка на миллион долларов. В свифт
 * [Nil-Coalescing Operator (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/BasicOperators.html#//apple_ref/doc/uid/TP40014097-CH6-ID72)
 * [Optional Chaining (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/OptionalChaining.html)
 * [Optional Protocol Requirements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html#//apple_ref/doc/uid/TP40014097-CH25-ID284)
+* [The as! Operator (developer.apple.com)](https://developer.apple.com/swift/blog/?id=23)
 * [Nullability and Objective-C (developer.apple.com)](https://developer.apple.com/swift/blog/?id=25)
 * [Option type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Option_type)
 * [Nullable type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Nullable_type)
