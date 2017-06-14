@@ -3,7 +3,7 @@ layout: post
 title: Swift Optionals
 date: '2017-06-04 10:00:00 +0300'
 tags: [swift]
-published: true
+published: false
 ---
 
 <!-- Всем привет! Я уже несколько лет профессионально (т.е. работа такая) занимаюсь iOS-разработкой, по большей части на Swift. Регулярно на почве свифтовых опционалов возникали ситуации, когда я знал _что_ нужно делать, но не совсем внятно представлял, _почему_ именно так. Приходилось отвлекаться и углубляться в документацию — количество "заметок на полях" пополнялось с удручающей периодичностью. В определенный момент они достигли критической массы, и я решил упорядочить их в едином исчерпывающем руководстве. Материал получился довольно объемным, поскольку предпринята попытка раскрыть тему максимально подробно. Статья будет полезна как начинающим Swift-разрабочикам, так и матерым профессионалам — есть ненулевая вероятность, что и последние найдут для себя что-то новое. А если не найдут, то добавят свое новое в комментарии, и всем будет польза. Прошу под кат!  -->
@@ -627,38 +627,54 @@ public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) reth
 {% endhighlight %}
 
 
-#### **Связка с Objective-C**
-В Objective-C нет понятия опциональности, близко по смыслу находится возможность вернуть `nil` из метода, который обычно возвращает объект. В Swift и в Objective-C лексема `nil` имеет различную смысловую нагрузку. В Swift `nil` — это _Nothing_, т.е. признак отсутствия значения в переменной optional-типа, применяется к любым optional-типам. В Objective-C `nil` является указателем на несуществующий объект и применим только к типам объектов.
+#### **Опционалы и Objective-C**
+В Objective-C нет понятия опциональности, и лексемой `nil` обозначается нулевой указатель, а не опционал в состоянии `.none`. В Swift любая переменная гарантированно не является `nil`, поэтому до Xcode 6.3 любой указатель из Objective-C транслировался в Swift как неявно извлекаемый опционал. В Xcode 6.3 в Objective-C для совместимости с семантикой опционалов были введены так называемые _nullability annotations_:
 
+{% highlight swift %}
 
-В Objective-C есть nullability annotations `_Nullable` и `_Nonnull` и nullability-аттрибуты свойств `nullable`, `nonnull`, `null_unspecified` и `null_resettable`. Они введены исключительно для совместимости с optional-семантикой в Swift, в Objective-C ни на что не влияют (если не считать предупреждений компиляции, например, при попытке присвоить nil nonnull-свойству). Кроме того, эти аттрибуты не применимы к примитивным типам, структурам и перечислениям. Подробнее про nullability annotations [здесь](https://developer.apple.com/swift/blog/?id=25) и очень понятно про nullability-аттрибуты свойств [здесь](https://habrahabr.ru/post/265175/).
-В чем разница между `_Nullable` и `nullable`?
-`null_unspecified` вообще нигде не упоминается, кроме как в статье на хабре.
+@interface myObject : NSObject
 
-**А ЧТО НАСЧЕТ конвертации кода?**
-  [Дополнительные замечания](https://medium.com/@thanyalukj/nullability-keywords-and-interoperability-between-objective-c-and-swift-220338af958b):
-  nonnull keywords are imported by Swift as a non-optional
-  nullable keywords are imported by Swift as an optional
-  Types declared without a nullability annotation are imported by Swift as implicitly unwrapped optional
-  null_resettable keyword is an interesting one.
+@property (copy, readonly) NSArray * _Nullable myValuesA;
+@property (copy, readonly) NSString * _Nonnull myStringA;
+
+@property (copy, readonly, nullable) NSArray * myValuesB;
+@property (copy, readonly, nonnull) NSString * myStringB;
+
+@end
+{% endhighlight %}
+
+К ним относятся `nullable` (или `_Nullable`), `nonnull` (или `_Nonnull`), а также `null_unspecified` и `null_resettable`[^6]. _Nullability_-aннотациями могут быть обозначены ссылочные типы в свойствах, а также параметрах и результатах функций. Помимо отдельных аннотаций можно использовать специальные макросы `NS_ASSUME_NONNULL_BEGIN` и `NS_ASSUME_NONNULL_END` для пометки участков кода целиком. Аннотации не являются полноценными модификаторами указателей или аттрибутами свойств, поскольку не влияют на компиляцию кода на Objective-C (если не считать предупреждений компиляции, например, при попытке присвоить `nil` свойству с аннотацией _nonnull_).
+
+[^6]: Аннотация `null_resettable` подразумевает, что сеттер свойства может принимать `nil`, но при этом геттер свойства вместо `nil` возвращает некоторое [значение по умолчанию](https://developer.apple.com/library/content/documentation/Xcode/Conceptual/RN-Xcode-Archive/Chapters/xc6_release_notes.html).
+
+Трансляция из Objective-C в Swift осуществлятся по следующим правилам:
+* значения из области между `NS_ASSUME_NONNULL_BEGIN` и `NS_ASSUME_NONNULL_END` импортируются в виде неопциональных (обычных) значений;
+* значения с аннотациями `nonnull` или `_Nonnull` импортируются в виде неопциональных (обычных) значений;
+* значения с аннотациями `nullable` или `_Nullable` импортируются в виде опционалов;
+* значения с аннотацией  `null_resettable` [импортируются в виде](https://developer.apple.com/videos/play/wwdc2015/202/?time=219) неявно извлекаемых опционалов;
+* значения без _nullability_-aннотаций или аннотацией `null_unspecified` (по умолчанию) импортируются в виде неявно извлекаемых опционалов.
+
+Правила передачи опционалов из Swift в Objective-C несколько проще:
+* если опционал в состоянии `.none`, то возвращается экземпляр _NSNull_;
+* если опционал в состоянии `.some`, то возвращается указатель на `.some`-значение.
 
 #### **Резюме, синтаксис**
 
-Лексема `!` может быть использована в трех контекстах, связанных с опциональностью[^6] :
+Лексема `!` может быть использована в трех контекстах, связанных с опциональностью[^7] :
 
 * для принудительного извлечения значения из опционала;
 * для объявления неявного опционала;
 * для принудительной конвертации типов в операторе `as!`.
 
-[^6]:Унарный логического отрицания `!` не считается, поскольку относится к другому контексту.
+[^7]:Унарный логического отрицания `!` не считается, поскольку относится к другому контексту.
 
-Лексема `?` может быть использована в двух контекстах, связанных с опциональностью[^7]:
+Лексема `?` может быть использована в трех контекстах, связанных с опциональностью[^8]:
 
 * для объявления явного опционала;
 * для использования опционала в _optional chaining_.
 * для опциональной конвертации типов в операторе `as?`.
 
-[^7]:Тернарный условный оператор `?` не считается, поскольку относится к другому контексту.
+[^8]:Тернарный условный оператор `?` не считается, поскольку относится к другому контексту.
 
 Лексема `??` может быть использована в двух контекстах:
 
@@ -681,9 +697,10 @@ public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) reth
 * [Optional Protocol Requirements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html#//apple_ref/doc/uid/TP40014097-CH25-ID284)
 * [The as! Operator (developer.apple.com)](https://developer.apple.com/swift/blog/?id=23)
 * [Nullability and Objective-C (developer.apple.com)](https://developer.apple.com/swift/blog/?id=25)
+* [Nullability and Optionals (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html#//apple_ref/doc/uid/TP40014216-CH4-ID45)
+* [Xcode 6.3 Release Notes: Objective-C Language Enhancements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Xcode/Conceptual/RN-Xcode-Archive/Chapters/xc6_release_notes.html)
 * [Option type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Option_type)
 * [Nullable type (en.wikipedia.org)](https://en.wikipedia.org/wiki/Nullable_type)
 * [Re-implementing Optionals using Swift’s powerful enum type (jamesonquave.com)](http://jamesonquave.com/blog/re-implementing-optionals-using-swifts-powerful-enum-type/)
-* [Атрибуты свойств в Objective-C (habrahabr.ru)](https://habrahabr.ru/post/265175/)
 
 ### {{ site.footnotes }}
