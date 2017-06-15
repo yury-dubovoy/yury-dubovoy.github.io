@@ -669,6 +669,40 @@ func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 {% endhighlight %}
 
 
+#### **Опционалы и обработка исключений**
+
+Swift поддерживает несколько способов обрработки исключений, и один из них — это преобразование исключения в `nil`. Такое преобразование можно осуществить автоматически с помощью оператора `try?` (примеры из [документации](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/ErrorHandling.html)):
+
+{% highlight swift %}
+
+func someThrowingFunction() throws -> Int {
+    // ...
+}
+
+// многословно
+let y: Int?
+do {
+    y = try someThrowingFunction()
+} catch {
+    y = nil
+}
+
+// лаконично
+let x = try? someThrowingFunction()
+
+{% endhighlight %}
+
+Обе переменные `x` и `y` являются опциональными, независимо от того, какой тип возвращает `someThrowingFunction()`. Таким образом, семантика поведения оператора `try?` такая же, как и у оператора `as?`. Логично также наличие оператора `try!`, который позволяет проигнорировать возможность выброса исключения из функции. Если исключение все же будет выброшено, то произойдет ошибка рантайма:
+
+{% highlight swift %}
+
+// ошибка рантайма, если loadImage будет выброшено исключение
+// photo не является опционалом (в отличие от x и y)
+let photo = try! loadImage(atPath: "./Resources/John Appleseed.jpg")
+
+{% endhighlight %}
+
+
 #### **Опционалы и Objective-C**
 В Objective-C нет понятия опциональности, и лексемой `nil` обозначается нулевой указатель, а не опционал в состоянии `.none`. В Swift любая переменная гарантированно не является `nil`, поэтому до Xcode 6.3 любой указатель из Objective-C транслировался в Swift как неявно извлекаемый опционал. В Xcode 6.3 в Objective-C для совместимости с семантикой опционалов были введены так называемые _nullability annotations_:
 
@@ -702,24 +736,23 @@ func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 
 #### **Резюме, синтаксис**
 
-Лексема `!` может быть использована в трех контекстах, связанных с опциональностью[^7] :
-
+Лексема `!` может быть использована в четырех контекстах, связанных с опциональностью[^7] :
 * для принудительного извлечения значения из опционала;
 * для объявления неявного опционала;
-* для принудительной конвертации типов в операторе `as!`.
+* для принудительной конвертации типов в операторе `as!`;
+* для принудительного подавления исключения в операторе `try!`.
 
 [^7]:Унарный оператор логического отрицания `!` не считается, поскольку относится к другому контексту.
 
-Лексема `?` может быть использована в трех контекстах, связанных с опциональностью[^8]:
-
+Лексема `?` может быть использована в четырех контекстах, связанных с опциональностью[^8]:
 * для объявления явного опционала;
-* для использования опционала в _optional chaining_.
-* для опциональной конвертации типов в операторе `as?`.
+* для использования опционала в _optional chaining_;
+* для опциональной конвертации типов в операторе `as?`;
+* для преобразования исключения в `nil` в операторе `try?`.
 
 [^8]:Тернарный условный оператор `?` не считается, поскольку относится к другому контексту.
 
 Лексема `??` может быть использована в двух контекстах:
-
 * в _Optional сhaining_ для обращения к опционалу второго уровня вложенности;
 * в качестве оператора _Nil-Coalescing_.
 
@@ -738,6 +771,7 @@ func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 * [Optional Chaining (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/OptionalChaining.html)
 * [Optional Protocol Requirements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html#//apple_ref/doc/uid/TP40014097-CH25-ID284)
 * [The as! Operator (developer.apple.com)](https://developer.apple.com/swift/blog/?id=23)
+* [Converting Errors to Optional Values (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/ErrorHandling.html)
 * [Nullability and Objective-C (developer.apple.com)](https://developer.apple.com/swift/blog/?id=25)
 * [Nullability and Optionals (developer.apple.com)](https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html#//apple_ref/doc/uid/TP40014216-CH4-ID45)
 * [Xcode 6.3 Release Notes: Objective-C Language Enhancements (developer.apple.com)](https://developer.apple.com/library/content/documentation/Xcode/Conceptual/RN-Xcode-Archive/Chapters/xc6_release_notes.html)
