@@ -3,10 +3,12 @@ layout: post
 title: Swift Optionals
 date: '2017-06-04 10:00:00 +0300'
 tags: [swift]
-published: false
+published: true
 ---
 
-<!-- Всем привет! Я уже несколько лет профессионально (т.е. работа такая) занимаюсь iOS-разработкой, по большей части на Swift. Регулярно на почве свифтовых опционалов возникали ситуации, когда я знал _что_ нужно делать, но не совсем внятно представлял, _почему_ именно так. Приходилось отвлекаться и углубляться в документацию — количество "заметок на полях" пополнялось с удручающей периодичностью. В определенный момент они достигли критической массы, и я решил упорядочить их в едином исчерпывающем руководстве. Материал получился довольно объемным, поскольку предпринята попытка раскрыть тему максимально подробно. Статья будет полезна как начинающим Swift-разрабочикам, так и матерым профессионалам — есть ненулевая вероятность, что и последние найдут для себя что-то новое. А если не найдут, то добавят свое новое в комментарии, и всем будет польза. Прошу под кат!  -->
+#### **Предисловие**
+
+Я уже несколько лет профессионально (т.е. работа такая) занимаюсь iOS-разработкой, по большей части на Swift. Регулярно на почве свифтовых опционалов возникали ситуации, когда я знал **что** нужно делать, но не совсем внятно представлял, **почему** именно так. Приходилось отвлекаться и углубляться в документацию — количество "заметок на полях" пополнялось с удручающей периодичностью. В определенный момент они достигли критической массы, и я решил упорядочить их в едином исчерпывающем руководстве. Материал получился довольно объемным, поскольку предпринята попытка раскрыть тему максимально подробно. Статья будет полезна как начинающим Swift-разрабочикам, так и матерым профессионалам — есть ненулевая вероятность, что и последние найдут для себя что-то новое. А если не найдут, то добавят свое новое в комментарии, и всем будет польза.
 
 #### **Что такое Optionals?**
 _Optionals_ (опционалы) — это удобный механизм обработки ситуаций, когда значение переменной может отсутствовать. Значение будет использовано, только если оно есть.
@@ -460,11 +462,25 @@ _Optional Binding_ позволяет проверить, содержит ли 
 
 В Swift каждый метод или функция без явно заданного `return` неявно возвращает [пустой кортеж](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Functions.html#//apple_ref/doc/uid/TP40014097-CH10-ID163) `()`. Оператор присваивания `=` является исключением и [не возвращает значение](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/BasicOperators.html#//apple_ref/doc/uid/TP40014097-CH6-ID62), тем самым позволяя избежать случайного присвоения вместо сравнения `==`.
 
- Допустим, что `=` неявно также обычно возвращает пустой кортеж, но если правый операнд является опционалом в состоянии `nil`, то оператор присваивания вернет `nil`. Тогда эту особенность можно будет использовать в условии `if`, поскольку пустой кортеж расценивается как _true_, а `nil` расценивается как _false_:
+ Допустим, что оператор присваивания неявно также обычно возвращает пустой кортеж, но если правый операнд является опционалом в состоянии `nil`, то оператор присваивания вернет `nil`. Тогда эту особенность можно будет использовать в условии `if`, так как пустой кортеж расценивается как _true_, а `nil` расценивается как _false_:
 
 {% highlight swift %}
 
-// не забыть пример кода!
+var my_optionalVariable: Int? = 42
+
+// условие истинно, my_variable "привязана" к .some-значению my_optionalVariable
+if let my_variable = my_optionalVariable {
+    print("\(my_variable)") // 42
+}
+
+my_optionalVariable = nil
+
+// условие ложно, my_variable не создана
+if let my_variable = my_optionalVariable {
+    print("\(my_variable)")
+} else {
+    print("Optional variable is nil!") // Optional variable is nil!
+}
 
 {% endhighlight %}
 
@@ -521,70 +537,32 @@ triangleShape as? Circle // nil
 
 {% highlight swift %}
 
-// не забыть пример кода!
+class Shape {}
+class Circle: Shape {}
+class Triangle: Shape {}
 
-{% endhighlight %}
+let circleShape: Shape = Circle()
+let triangleShape: Shape = Triangle()
 
-
-#### **Фунции map и flatMap**
-условно можно отнести к идиомам, потому что это просто функции, определнные в системном перечислении _Optional_
-
-
-
-Использование условий в качестве проверки, был ли выполнен метод или было ли успешно присвание: каждый метод/функция без return неявно возращает пустой кортеж, что может быть использовано для проверки на `nil`. Дело вкуса, но не факт, что подобная запись выглядит более естественно, чем явная предварительная проверка. Зависит от договоренностей по стилю кодирования, принятых на проекте.
-https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/OptionalChaining.html#//apple_ref/doc/uid/TP40014097-CH21-ID249
-
-
-
-(_МОЖЕТ, СТОИТ УБРАТЬ УПОМИНАНИЯ ЭТИХ МЕТОДОВ map<U>— ОНИ НЕ ИМЕЕЮТ ОТНОШЕНИЯ К ТЕМЕ?_).
-Еще как имеют.
-
-
-{% highlight swift %}
-let arrayOfOptionals: [Int?] = [1, nil, 5, 2, nil]
-let arrayOfNumbers = arrayOfOptionals.flatMap { $0 }
-print(arrayOfNumbers) // [1, 5, 2]
-{% endhighlight %}
-
-// плохой пример, неудобно читать
-let attachHeight: CGFloat = attach.map { $0.isForward() ? 100 : 0 } ?? 0
-
-let attachHeight: CGFloat
-if attach != nil {
-    attachHeight = attach!.isForward() ? 100 : 0
+// условие истинно, успешное приведение
+if let circle = circleShape as? Circle {
+    print("Cast success: \(type(of: circle))") // Cast success: (Circle #1)
 } else {
-    attachHeight = 0
+    print("Cast failure")
 }
 
-// хороший пример, удобно читать
-replaySplitter.frame = textCellLayout.replaySptillerFrame.map { $0 } ?? CGRect.zero
-
-if textCellLayout.replaySptillerFrame != nil {
-    replaySplitter.frame = textCellLayout.replaySptillerFrame!
+// условие ложно, приведение не удалось
+if let circle = triangleShape as? Circle {
+    print("Cast success: \(type(of: circle))")
 } else {
-    replaySplitter.frame = CGRect.zero
+    print("Cast failure") // Cast failure
 }
 
-
-
-конструкция map/flatmap
-_I'm talking about the map and flatMap functions of Swift optionals (not the Array map function)._
-http://blog.xebia.com/the-power-of-map-and-flatmap-of-swift-optionals/
-
-
-На вход подаем трансформирующую функцию
-
-{% highlight swift %}
-public func flatMap<U>(_ transform: (Wrapped) throws -> U?) rethrows -> U?
 {% endhighlight %}
-которая принимает unwrapped элемент.
-
-Разница между map и flatmap только в том, что во flatMap можно в кложурке отдавать nil, а в map нельзя
-
-Не уверен, что этот механизм потом легко читать (пример с UICell), но, если привыкнуть к маппированию на проекте (маппирование принимает трансформирующую функцию), то вроде как и ок (сравнить с мапиирование коллекции).
-https://www.natashatherobot.com/swift-using-map-to-deal-with-optionals/
 
 
+#### **map и flatMap**
+Методы `map` и `flatMap` условно можно отнести к идиомам Swift, потому что они определены в системном перечислении _Optional_:
 
 {% highlight swift %}
 public enum Optional<Wrapped> : ExpressibleByNilLiteral {
@@ -595,20 +573,12 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
     /// passing the unwrapped value as a parameter.
     ///
     /// Use the `map` method with a closure that returns a nonoptional value.
-    /// - Parameter transform: A closure that takes the unwrapped value
-    ///   of the instance.
-    /// - Returns: The result of the given closure. If this instance is `nil`,
-    ///   returns `nil`.
     public func map<U>(_ transform: (Wrapped) throws -> U) rethrows -> U?
 
     /// Evaluates the given closure when this `Optional` instance is not `nil`,
     /// passing the unwrapped value as a parameter.
     ///
     /// Use the `flatMap` method with a closure that returns an optional value.
-    /// - Parameter transform: A closure that takes the unwrapped value
-    ///   of the instance.  
-    /// - Returns: The result of the given closure. If this instance is `nil`,
-    ///   returns `nil`.
     public func flatMap<U>(_ transform: (Wrapped) throws -> U?) rethrows -> U?
 
         ...
@@ -616,13 +586,76 @@ public enum Optional<Wrapped> : ExpressibleByNilLiteral {
 }
 {% endhighlight %}
 
-
+Данные методы позволяют осуществлять проверку опционала на наличие `.some`-значения и обрабатывать это значение в замыкании, полученном в виде параметра. Оба метода возвращают `nil`, если исходный опционал `nil`. Разница между `map` и `flatmap` заключается в возможностях замыкания-параметра: для `flatMap` замыкание может дополнительно возвращать `nil` (опционал), а для `map` замыкание всегда возвращает обычное значение:
 
 {% highlight swift %}
 
-public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T) rethrows -> T
+let my_variable: Int? = 4
 
-public func ??<T>(optional: T?, defaultValue: @autoclosure () throws -> T?) rethrows -> T?
+let my_squareVariable = my_variable.map { v in
+    return v * v
+}
+
+print("\(my_squareVariable)") // Optional(16)
+
+let my_reciprocalVariable: Double? = my_variable.flatMap { v in
+    if v == 0 {
+        return nil
+    }
+    return 1.0 / Double(v)
+}
+
+print("\(my_reciprocalVariable)") // Optional(0.25)
+
+{% endhighlight %}
+
+Выражения с `map` и `flatmap` обычно более лаконичны, чем конструкции с предварительной проверкой в `if` или `guard`, и воспринимаются легче, чем конструкции с тернарным условным оператором:
+
+{% highlight swift %}
+
+let dateFormatter = DateFormatter()
+dateFormatter.dateFormat = "dd MMM yyyy"
+let date: Date? = extractOptionalDate()
+
+// многословно
+let dateStringA: String
+if date != nil {
+    dateStringA = dateFormatter.string(from: date!)
+} else {
+    dateStringA = "Unknown date"
+}
+
+// в одну строку, но сложно воспринимать
+let dateStringB =
+(date == nil ? nil : dateFormatter.string(from: date!)) ?? "Unknown date"
+
+// лаконично, с непривычки сложно воспринимать (если map используется редко)
+let dateStringC = date.map(dateFormatter.string) ?? "Unknown date"
+
+{% endhighlight %}
+
+Уместность той или иной идиомы во многом зависит от договоренностей по стилю кодирования, принятых на проекте. Вполне возможно, что явные проверка опционала и работа с извлеченным `.some`-значением будут выглядеть естественнее, чем применение `map` или `flatmap`:
+
+{% highlight swift %}
+
+// отдельно Optional Binding и явный вызов метода у извлеченного объекта
+func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+  if let cell = sender as? UITableViewCell,
+    let indexPath = tableView.indexPathForCell(cell) {
+      let item = items[indexPath.row]
+  }
+}
+
+// В одном вызове 3 этапа:
+// 1) опционал как результат приведения типов;
+// 2) передача неявного замыкания в метод flatMap полученного опционала;
+// 3) Optional Binding к результату flatMap.
+func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+  if let indexPath =
+    (sender as? UITableViewCell).flatMap(tableView.indexPathForCell) {
+      let item = items[indexPath.row]
+  }
+}
 
 {% endhighlight %}
 
