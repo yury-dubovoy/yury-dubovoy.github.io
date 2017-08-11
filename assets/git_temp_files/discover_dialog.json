@@ -1,6 +1,8 @@
 [
   {
     "id": "1229327257",
+    "type": "group",
+    "peer": { "id": 1229327257, "type": "group" },
     "title": "dialog клуб",
     "shortname": "dialog клуб",
     "description": "Самый пройстой способ обсудить мессенджер, пообщаться и найти новых друзей.",
@@ -9,6 +11,8 @@
   },
   {
     "id": "2115000900",
+    "type": "group",
+    "peer": { "id": 2115000900, "type": "group" },
     "title": "dialog club",
     "shortname": "dialog club",
     "description": "Easiest way to discuss the dialog, communicate and find new friends.",
