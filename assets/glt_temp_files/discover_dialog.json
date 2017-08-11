@@ -1,0 +1,19 @@
+[
+  {
+    "id": "1229327257",
+    "title": "dialog клуб",
+    "shortname": "dialog клуб",
+    "description": "Самый пройстой способ обсудить мессенджер, пообщаться и найти новых друзей.",
+    "token": "https://dlg.im/@/joinchat/ff5146df8b4f4543246821ea8853e63bfce7997b847ae1c452782aad24012c34",
+    "avatar": "https://yury-dubovoy.github.io/assets/glt_temp_files/large-avatar-dialog-club-rus.png"
+  },
+  {
+    "id": "2115000900",
+    "title": "dialog club",
+    "shortname": "dialog club",
+    "description": "Easiest way to discuss the dialog, communicate and find new friends.",
+    "token": "https://dlg.im/@/joinchat/557a7fcf25242db7a9e5c1ab3ba4ee7019842b9a3eaebdf5a5aa7a030c10400a",
+    "avatar": "https://yury-dubovoy.github.io/assets/glt_temp_files/large-avatar-dialog-club-eng.png"
+  }
+  
+]
