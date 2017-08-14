@@ -70,16 +70,6 @@
     "avatar": ""
   },
   {
-    "id": "",
-    "type": "group",
-    "peer": { "id": , "type": "group" },
-    "title": "",
-    "shortname": "",
-    "description": "",
-    "token": "https://dlg.im/@/joinchat/",
-    "avatar": ""
-  },
-  {
     "id": "1710570499",
     "type": "group",
     "peer": { "id": 1710570499, "type": "group" },
