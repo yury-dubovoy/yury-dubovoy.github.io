@@ -1,23 +1,33 @@
 [
   {
-    "id": "1229327257",
+    "id": "464188866",
     "type": "group",
-    "peer": { "id": 1229327257, "type": "group" },
-    "title": "dialog клуб",
-    "shortname": "dialog клуб",
-    "description": "Самый пройстой способ обсудить мессенджер, пообщаться и найти новых друзей.",
-    "token": "https://dlg.im/@/joinchat/ff5146df8b4f4543246821ea8853e63bfce7997b847ae1c452782aad24012c34",
-    "avatar": "https://yury-dubovoy.github.io/assets/git_temp_files/large-avatar-dialog-club-rus.jpg"
+    "peer": { "id": 464188866, "type": "group" },
+    "title": "Daily",
+    "shortname": "Daily",
+    "description": "Ежедневные митинги в 13:00",
+    "token": "https://dlg.im/@/joinchat/8baf75704b966dbb051d119348f3113904e4c07afb0d5971d4042510582e6cc1",
+    "avatar": ""
   },
   {
-    "id": "2115000900",
+    "id": "74228877",
     "type": "group",
-    "peer": { "id": 2115000900, "type": "group" },
-    "title": "dialog club",
-    "shortname": "dialog club",
-    "description": "Easiest way to discuss the dialog, communicate and find new friends.",
-    "token": "https://dlg.im/@/joinchat/557a7fcf25242db7a9e5c1ab3ba4ee7019842b9a3eaebdf5a5aa7a030c10400a",
-    "avatar": "https://yury-dubovoy.github.io/assets/git_temp_files/large-avatar-dialog-club-eng.jpg"
+    "peer": { "id": 74228877, "type": "group" },
+    "title": "Workflow",
+    "shortname": "Workflow",
+    "description": "Рабочие вопросы",
+    "token": "https://dlg.im/@/joinchat/b8c46da718945a7f887a4971103acdf71440670e2e285ebdc88cfe4d3ea722ba",
+    "avatar": ""
+  },
+  {
+    "id": "238478118",
+    "type": "group",
+    "peer": { "id": 238478118, "type": "group" },
+    "title": "Krovatka.ru",
+    "shortname": "Krovatka.ru",
+    "description": "Общение на отстраненные темы",
+    "token": "https://dlg.im/@/joinchat/f0161b9be9a2ec5df0b42ca7b5e57c3ea416e3f14f4173b04b9a8426b8b04f5f",
+    "avatar": ""
   }
   
 ]
