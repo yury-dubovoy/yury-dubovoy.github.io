@@ -28,6 +28,76 @@
     "description": "Общение на отстраненные темы",
     "token": "https://dlg.im/@/joinchat/f0161b9be9a2ec5df0b42ca7b5e57c3ea416e3f14f4173b04b9a8426b8b04f5f",
     "avatar": ""
+  },
+  {
+    "id": "180858133",
+    "type": "group",
+    "peer": { "id": 180858133, "type": "group" },
+    "title": "Server",
+    "shortname": "Server",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/17a0b5ac387587c7d6bb196cdf14f7e6eb9274e7b732b78ddf701fa0908bb34f",
+    "avatar": ""
+  },
+  {
+    "id": "2096951591",
+    "type": "group",
+    "peer": { "id": 2096951591, "type": "group" },
+    "title": "Devops",
+    "shortname": "Devops",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/70a6dde2bd0986257b486e682b56af35135935e12b407fb1b893257dce40727c",
+    "avatar": ""
+  },
+  {
+    "id": "1435888361",
+    "type": "group",
+    "peer": { "id": 1435888361, "type": "group" },
+    "title": "Clients",
+    "shortname": "Clients",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/d7cbffd5b751700e4501d68cff18c27e4200a81b4f0ba4f208b2d479230cf2ee",
+    "avatar": ""
+  },
+  {
+    "id": "1145856878",
+    "type": "group",
+    "peer": { "id": 1145856878, "type": "group" },
+    "title": "iOS",
+    "shortname": "iOS",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/41b1c57a87e436f044584a90698dc06775d74884f9070012fe943ecdc26018e8",
+    "avatar": ""
+  }
+  {
+    "id": "",
+    "type": "group",
+    "peer": { "id": , "type": "group" },
+    "title": "",
+    "shortname": "",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/",
+    "avatar": ""
+  },
+  {
+    "id": "1710570499",
+    "type": "group",
+    "peer": { "id": 1710570499, "type": "group" },
+    "title": "Android",
+    "shortname": "Android",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/e87df684a7e187da3ac760a6b5cf35ffb538542309fb2e3f063354afb070d0b3",
+    "avatar": ""
+  },
+  {
+    "id": "1421407744",
+    "type": "group",
+    "peer": { "id": 1421407744, "type": "group" },
+    "title": "Web",
+    "shortname": "Web",
+    "description": "",
+    "token": "https://dlg.im/@/joinchat/ba996aee0a6ca35ff83b50c6117c8f5883f7797ce6acd260665dbbba364dec0f",
+    "avatar": ""
   }
   
 ]
